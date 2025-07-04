@@ -1,9 +1,10 @@
+import { authenticate } from "./../middleware/auth";
 import { Router } from "express";
 import prisma from "../lib/prisma";
 
 const router = Router();
 
-router.post("/", async (req: any, res: any) => {
+router.post("/", authenticate, async (req: any, res: any) => {
   try {
     const { text, imageId } = req.body;
 
