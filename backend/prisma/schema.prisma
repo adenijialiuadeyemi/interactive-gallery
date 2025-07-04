@@ -13,3 +13,29 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Image {
+  id          String    @id @default(cuid())
+  unsplashId  String    @unique
+  title       String
+  author      String
+  description String?
+  tags        String[]
+  createdAt   DateTime  @default(now())
+  comments    Comment[]
+  likes       Int       @default(0)
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  text      String
+  createdAt DateTime @default(now())
+  image     Image    @relation(fields: [imageId], references: [id])
+  imageId   String
+}
+
+model User {
+  id    String @id @default(cuid())
+  name  String
+  token String @unique
+}
