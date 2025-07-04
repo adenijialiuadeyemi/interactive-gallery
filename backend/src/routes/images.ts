@@ -68,22 +68,72 @@ router.post("/save", async (req: any, res: any) => {
 
 router.get("/saved", async (req, res) => {
   try {
-    const images = await prisma.image.findMany({
-      include: {
-        comments: {
-          orderBy: { createdAt: "desc" },
-        },
-        _count: {
-          select: { likes: true },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+    // Parse query params or fall back to defaults
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 6;
+    const skip = (page - 1) * limit;
 
-    res.json(images);
-  } catch (err: any) {
+    const search = (req.query.search as string) || "";
+    const tag = (req.query.tag as string) || "";
+
+    // Build Prisma 'where' filter object dynamically
+    const where: any = { AND: [] };
+
+    // Search filter across title, description, and author (case insensitive)
+    if (search) {
+      where.AND.push({
+        OR: [
+          { title: { contains: search, mode: "insensitive" } },
+          { description: { contains: search, mode: "insensitive" } },
+          { author: { contains: search, mode: "insensitive" } },
+        ],
+      });
+    }
+
+    // Tag filter (match if tag exists in the tags[] array)
+    if (tag) {
+      where.AND.push({
+        tags: {
+          has: tag,
+        },
+      });
+    }
+
+    // Fetch paginated and filtered results + total count in parallel
+    const [images, total] = await Promise.all([
+      prisma.image.findMany({
+        where: where.AND.length ? where : undefined,
+        include: {
+          comments: {
+            orderBy: { createdAt: "desc" },
+          },
+          _count: {
+            select: { likes: true },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
+      }),
+      prisma.image.count({
+        where: where.AND.length ? where : undefined,
+      }),
+    ]);
+
+    // Check if more pages are available
+    const hasMore = skip + images.length < total;
+
+    // Respond with pagination info and images
+    res.json({
+      page,
+      limit,
+      total,
+      hasMore,
+      images,
+    });
+  } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to fetch saved images" });
+    res.status(500).json({ error: "Error filtering images" });
   }
 });
 
