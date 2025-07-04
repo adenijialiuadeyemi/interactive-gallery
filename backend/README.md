@@ -50,17 +50,22 @@ backend/
 └── tsconfig.json
 ```
 
+---
+
 ## ⚙️ Environment Variables
 
-```
 Create a `.env` file in the `backend/` root:
-```
 
+```
 DATABASE_URL="your_neon_or_postgres_url"
 UNSPLASH_ACCESS_KEY="your_unsplash_api_key"
+```
+
+---
 
 ## 📦 Setup & Installation
 
+```
 # Clone the repo
 
 git clone https://github.com/adenijialiuadeyemi/interactive-gallery.git
@@ -81,6 +86,10 @@ npx prisma generate
 # Start dev server
 
 npm run dev
+
+```
+
+---
 
 ## 🧪 API Documentation
 
@@ -114,7 +123,8 @@ Save a selected Unsplash image to the DB.
 }
 ```
 
-🗂️ Get Saved ImagesGET /api/images/saved
+🗂️ Get Saved Images
+GET /api/images/saved
 Supports:
 
 - page (number)
@@ -161,6 +171,8 @@ Returns:
 { "message": "Liked" } // or "Unliked"
 ```
 
+---
+
 ## 🧠 Design Notes
 
 - Unsplash + Local DB hybrid model allows you to browse from Unsplash while enriching saved images with likes/comments.
@@ -171,6 +183,8 @@ Returns:
 
 - Prisma ORM allows fast and flexible DB querying with type safety.
 
+---
+
 ## 🔗 External Links
 
 -🔌 Unsplash Developer API
@@ -178,6 +192,8 @@ Returns:
 - 📚 Prisma ORM Docs
 
 - 🗄️ Neon Postgres
+
+---
 
 ## ✨ Author
 
