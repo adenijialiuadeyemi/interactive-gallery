@@ -1,6 +1,6 @@
 # 🖼️ Interactive Gallery API (Backend)
 
-Welcome to the backend service for **The Interactive Gallery** — a full-stack image browsing app that allows users to explore Unsplash images, save their favorites, comment, and like them. Built to demonstrate robust backend architecture with a clean and developer-friendly API.
+Welcome to the backend service for **The Interactive Gallery** — a Full-Stack image browsing app that allows users to explore Unsplash images, save their favorites, comment, and like them. Built to demonstrate robust backend architecture with a clean and developer-friendly API.
 
 ---
 
@@ -52,28 +52,34 @@ backend/
 
 ## ⚙️ Environment Variables
 
+```
 Create a `.env` file in the `backend/` root:
+```
 
-```env
 DATABASE_URL="your_neon_or_postgres_url"
 UNSPLASH_ACCESS_KEY="your_unsplash_api_key"
 
 ## 📦 Setup & Installation
 
 # Clone the repo
+
 git clone https://github.com/adenijialiuadeyemi/interactive-gallery.git
 
 # Navigate into the backend folder
+
 cd interactive-gallery/backend
 
 # Install dependencies
+
 npm install
 
 # Setup Prisma and DB
+
 npx prisma db push
 npx prisma generate
 
 # Start dev server
+
 npm run dev
 
 ## 🧪 API Documentation
@@ -83,30 +89,22 @@ POST /api/auth
 Create or retrieve a user by name. Returns a token.
 
 ```
-
-Copy code
-
 { "name": "Aliu" }
-
 ```
 
 📤 Unsplash
 GET /api/images/unsplash
 Fetch random public images from Unsplash.
 
-bash
-Copy code
 ```
-
 Query: ?page=1&limit=12
-
 ```
 
 💾 Save Image
 POST /api/images
 Save a selected Unsplash image to the DB.
-```
 
+```
 {
 "unsplashId": "123abc",
 "title": "Sunset View",
@@ -114,28 +112,23 @@ Save a selected Unsplash image to the DB.
 "description": "Stunning sky view",
 "tags": ["sunset", "nature"]
 }
-
 ```
 
 🗂️ Get Saved ImagesGET /api/images/saved
 Supports:
 
 - page (number)
-
 - limit (number)
-
 - search (string)
-
 - tag (string)
 
 ```
-
 GET /api/images/saved?page=1&limit=6&search=sunset&tag=nature
-
 ```
+
 Returns:
-```
 
+```
 {
 "page": 1,
 "limit": 6,
@@ -143,7 +136,6 @@ Returns:
 "hasMore": true,
 "images": [...]
 }
-
 ```
 
 💬 Comments
@@ -152,12 +144,10 @@ Add a comment to a saved image
 Auth required: Authorization: Bearer <token>
 
 ```
-
 {
 "text": "Beautiful capture!",
 "imageId": "clxyz123"
 }
-
 ```
 
 ❤️ Like / Unlike
@@ -166,13 +156,13 @@ Toggles like/unlike on a saved image
 Auth required: Authorization: Bearer <token>
 
 Returns:
+
 ```
-
 { "message": "Liked" } // or "Unliked"
-
 ```
 
 ## 🧠 Design Notes
+
 - Unsplash + Local DB hybrid model allows you to browse from Unsplash while enriching saved images with likes/comments.
 
 - Token-based authentication (using UUIDs) avoids passwords for simplicity while simulating secure identity.
@@ -182,6 +172,7 @@ Returns:
 - Prisma ORM allows fast and flexible DB querying with type safety.
 
 ## 🔗 External Links
+
 -🔌 Unsplash Developer API
 
 - 📚 Prisma ORM Docs
@@ -189,7 +180,6 @@ Returns:
 - 🗄️ Neon Postgres
 
 ## ✨ Author
+
 Built with ❤️ by Adeniji Aliu Adeyemi
 https://github.com/adenijialiuadeymi
-
-```
