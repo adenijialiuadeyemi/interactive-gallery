@@ -65,4 +65,22 @@ router.post("/save", async (req: any, res: any) => {
   }
 });
 
+router.get("/saved", async (req, res) => {
+  try {
+    const images = await prisma.image.findMany({
+      include: {
+        comments: {
+          orderBy: { createdAt: "desc" },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    res.json(images);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch saved images" });
+  }
+});
+
 export default router;
