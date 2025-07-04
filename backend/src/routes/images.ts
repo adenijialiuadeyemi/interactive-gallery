@@ -1,6 +1,6 @@
 import { Router } from "express";
 import axios from "axios";
-
+import prisma from "../lib/prisma";
 const router = Router();
 
 router.get("/unsplash", async (req, res) => {
@@ -32,6 +32,36 @@ router.get("/unsplash", async (req, res) => {
   } catch (error: any) {
     console.error(error.response?.data || error.message);
     res.status(500).json({ error: "Failed to fetch from Unsplash" });
+  }
+});
+
+router.post("/save", async (req: any, res: any) => {
+  try {
+    const { unsplashId, title, author, description, tags } = req.body;
+
+    // Check for duplicate
+    const existing = await prisma.image.findUnique({
+      where: { unsplashId },
+    });
+
+    if (existing) {
+      return res.status(409).json({ message: "Image already saved" });
+    }
+
+    const image = await prisma.image.create({
+      data: {
+        unsplashId,
+        title,
+        author,
+        description,
+        tags,
+      },
+    });
+
+    res.status(201).json(image);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: "Error saving image" });
   }
 });
 
