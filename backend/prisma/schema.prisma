@@ -22,7 +22,7 @@ model Image {
   tags        String[]
   createdAt   DateTime  @default(now())
   comments    Comment[]
-  likes       Int       @default(0)
+  likes       Like[]
 }
 
 model Comment {
@@ -37,4 +37,16 @@ model User {
   id    String @id @default(cuid())
   name  String
   token String @unique
+  likes Like[]
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  image     Image    @relation(fields: [imageId], references: [id])
+  imageId   String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, imageId])
 }

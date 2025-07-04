@@ -1,6 +1,7 @@
 import { Router } from "express";
 import axios from "axios";
 import prisma from "../lib/prisma";
+import { authenticate } from "../middleware/auth";
 const router = Router();
 
 router.get("/unsplash", async (req, res) => {
@@ -72,6 +73,9 @@ router.get("/saved", async (req, res) => {
         comments: {
           orderBy: { createdAt: "desc" },
         },
+        _count: {
+          select: { likes: true },
+        },
       },
       orderBy: { createdAt: "desc" },
     });
@@ -80,6 +84,49 @@ router.get("/saved", async (req, res) => {
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch saved images" });
+  }
+});
+
+// Like or Unlike an image
+router.post("/like/:id", authenticate, async (req: any, res: any) => {
+  try {
+    const imageId = req.params.id;
+    // @ts-ignore
+    const user = req.user;
+
+    // Check if image exists
+    const image = await prisma.image.findUnique({ where: { id: imageId } });
+    if (!image) return res.status(404).json({ error: "Image not found" });
+
+    // Check if user already liked this image
+    const existingLike = await prisma.like.findUnique({
+      where: {
+        userId_imageId: {
+          userId: user.id,
+          imageId,
+        },
+      },
+    });
+
+    if (existingLike) {
+      // Unlike
+      await prisma.like.delete({
+        where: { id: existingLike.id },
+      });
+      return res.json({ message: "Unliked" });
+    } else {
+      // Like
+      await prisma.like.create({
+        data: {
+          userId: user.id,
+          imageId,
+        },
+      });
+      return res.json({ message: "Liked" });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error toggling like" });
   }
 });
 
