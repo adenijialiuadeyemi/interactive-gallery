@@ -201,4 +201,68 @@ router.post("/like/:unsplashId", authenticate, async (req: any, res: any) => {
   }
 });
 
+router.get("/:unsplashId", async (req: any, res: any) => {
+  const { unsplashId } = req.params;
+
+  try {
+    let image = await prisma.image.findUnique({
+      where: { unsplashId },
+      include: {
+        comments: {
+          orderBy: { createdAt: "desc" },
+          include: { user: true },
+        },
+        _count: {
+          select: { likes: true },
+        },
+      },
+    });
+
+    if (!image) {
+      // Fetch from Unsplash if not found in DB
+      const response = await axios.get(
+        `https://api.unsplash.com/photos/${unsplashId}`,
+        {
+          headers: {
+            Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}`,
+          },
+        }
+      );
+
+      const data = response.data;
+
+      image = await prisma.image.create({
+        data: {
+          unsplashId: data.id,
+          title: data.alt_description || "Untitled",
+          author: data.user.name,
+          description: data.description || "",
+          thumbnail: data.urls.thumb,
+          full: data.urls.full,
+          tags: data.tags?.map((tag: any) => tag.title) || [],
+        },
+      });
+
+      // Reload to include defaults (e.g., comments)
+      image = await prisma.image.findUnique({
+        where: { unsplashId },
+        include: {
+          comments: {
+            orderBy: { createdAt: "desc" },
+            include: { user: true },
+          },
+          _count: {
+            select: { likes: true },
+          },
+        },
+      });
+    }
+
+    res.json(image);
+  } catch (err) {
+    console.error("❌ Error fetching image details:", err);
+    res.status(500).json({ error: "Failed to load image details" });
+  }
+});
+
 export default router;
