@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { fetchUnsplashImages } from '../api/unsplash';
-import { Save } from 'lucide-react';
+import { Heart, Save } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../store/useAuthStore';
+import { useLikeStore } from '../store/useLikeStore';
 
 interface UnsplashImage {
   unsplashId: string;
@@ -10,12 +13,19 @@ interface UnsplashImage {
   full: string;
   description: string;
   tags: string[];
+  liked?: boolean;
 }
 
 
 export default function GalleryPage() {
   const [images, setImages] = useState<UnsplashImage[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const user = useAuthStore((state) => state.user);
+  const navigate = useNavigate();
+
+  const toggleLike = useLikeStore((state) => state.toggleLike);
+
 
   useEffect(() => {
     const loadImages = async () => {
@@ -83,11 +93,42 @@ export default function GalleryPage() {
                     title="Save image"
                     onClick={() => alert('Save functionality coming soon')}
                   >
-                    <Save className="h-4 w-4 mr-1" />
+                    <Save className="h-4 w-4 mr-1" onClick={() => {
+                      if (!user) {
+                        navigate('/login');
+                        return;
+                      }
+                      alert('✅ Image saved (feature coming soon)');
+                    }}
+                    />
                     Save
                   </button>
 
-                  {/* You can show tags or likes here */}
+                  <button
+                    className={`flex items-center text-sm ${img.liked ? 'text-red-500' : 'text-gray-400'
+                      }`}
+                    onClick={async () => {
+                      if (!user) return navigate('/login');
+
+                      try {
+                        await toggleLike(img.unsplashId, user);
+                        setImages((prev) =>
+                          prev.map((i) =>
+                            i.unsplashId === img.unsplashId ? { ...i, liked: !i.liked } : i
+                          )
+                        );
+                      } catch (err) {
+                        console.error('Like toggle failed:', err);
+                      }
+                    }}
+
+                  >
+                    <Heart
+                      className={`w-4 h-4 mr-1 ${img.liked ? 'fill-red-500' : 'fill-transparent'
+                        }`}
+                    />
+                    {img.liked ? 'Liked' : 'Like'}
+                  </button>
                 </div>
               </div>
             </div>

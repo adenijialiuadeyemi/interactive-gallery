@@ -1,30 +1,39 @@
 import { create } from "zustand";
+import axios from "axios";
 
-// Define the shape of our authentication state
 interface AuthState {
-  user: string | null; // Stores the username
-  token: string | null; // Stores a fake token (in real apps, this would be JWT or similar)
-  login: (user: string, token: string) => void;
+  user: { id: string; name: string } | null;
+  token: string | null;
+  login: (email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
-// Create the Zustand store
 export const useAuthStore = create<AuthState>((set) => ({
-  // Initialize state from localStorage so it persists after page reload
-  user: localStorage.getItem("user") || null,
-  token: localStorage.getItem("token") || null,
+  user: null,
+  token: localStorage.getItem("token"),
 
-  // Login method: saves user & token to state and localStorage
-  login: (user, token) => {
-    localStorage.setItem("user", user);
-    localStorage.setItem("token", token);
-    set({ user, token });
+  login: async (email, password) => {
+    const res = await axios.post("http://localhost:5000/api/auth/login", {
+      email,
+      password,
+    });
+    set({ user: res.data.user, token: res.data.token });
+    localStorage.setItem("token", res.data.token);
   },
 
-  // Logout method: clears both state and localStorage
+  register: async (name, email, password) => {
+    const res = await axios.post("http://localhost:5000/api/auth/register", {
+      name,
+      email,
+      password,
+    });
+    set({ user: res.data.user, token: res.data.token });
+    localStorage.setItem("token", res.data.token);
+  },
+
   logout: () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
     set({ user: null, token: null });
+    localStorage.removeItem("token");
   },
 }));
