@@ -3,6 +3,7 @@ import GalleryPage from './pages/GalleryPage';
 
 import LoginPage from './pages/LoginPage';
 import Navbar from './components/Navbar';
+import RegisterPage from './pages/RegisterPage';
 
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
       <Routes>
         <Route path="/" element={<GalleryPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
       </Routes>
     </>
   );
