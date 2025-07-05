@@ -4,6 +4,7 @@ import GalleryPage from './pages/GalleryPage';
 import LoginPage from './pages/LoginPage';
 import Navbar from './components/Navbar';
 import RegisterPage from './pages/RegisterPage';
+import ImageDetailPage from './pages/ImageDetailPage';
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
         <Route path="/" element={<GalleryPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/:unsplashId" element={<ImageDetailPage />} />
       </Routes>
     </>
   );

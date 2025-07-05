@@ -73,13 +73,15 @@ export default function GalleryPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {images.map((img) => (
             <div
+
               key={img.unsplashId}
               className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300"
             >
               <img
+                onClick={() => navigate(`/${img.unsplashId}`)}
                 src={img.thumbnail}
                 alt={img.title}
-                className="w-full h-56 object-cover"
+                className="w-full h-56 object-cover cursor-pointer"
               />
               <div className="p-4">
                 <h2 className="text-md font-semibold text-gray-800 truncate">

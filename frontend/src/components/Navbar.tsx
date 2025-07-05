@@ -13,7 +13,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow p-4 flex justify-between items-center">
+    <nav className="bg-white shadow p-4 flex justify-between items-center sticky top-0 z-50">
       <Link to="/" className="flex items-center space-x-2 text-xl font-bold text-blue-600">
         <Image className="w-6 h-6" />
         <span>Gallery</span>
