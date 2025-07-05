@@ -1,16 +1,19 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import GalleryPage from './pages/GalleryPage';
-import SavedPage from './pages/SavedPage';
+
+import LoginPage from './pages/LoginPage';
+import Navbar from './components/Navbar';
 
 
 function App() {
   return (
-    <Router>
+    <>
+      <Navbar />
       <Routes>
         <Route path="/" element={<GalleryPage />} />
-        <Route path="/saved" element={<SavedPage />} />
+        <Route path="/login" element={<LoginPage />} />
       </Routes>
-    </Router>
+    </>
   );
 }
 
