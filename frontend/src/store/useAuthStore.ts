@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import axios from "axios";
+import axios from "../api/axios";
 
 interface AuthState {
   user: { id: string; name: string } | null;
@@ -9,31 +9,39 @@ interface AuthState {
   logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  token: localStorage.getItem("token"),
+export const useAuthStore = create<AuthState>((set) => {
+  const storedUser = localStorage.getItem("user");
+  const storedToken = localStorage.getItem("token");
 
-  login: async (email, password) => {
-    const res = await axios.post("http://localhost:5000/api/auth/login", {
-      email,
-      password,
-    });
-    set({ user: res.data.user, token: res.data.token });
-    localStorage.setItem("token", res.data.token);
-  },
+  return {
+    user: storedUser ? JSON.parse(storedUser) : null,
+    token: storedToken || null,
 
-  register: async (name, email, password) => {
-    const res = await axios.post("http://localhost:5000/api/auth/register", {
-      name,
-      email,
-      password,
-    });
-    set({ user: res.data.user, token: res.data.token });
-    localStorage.setItem("token", res.data.token);
-  },
+    login: async (email, password) => {
+      const res = await axios.post("http://localhost:5000/api/auth/login", {
+        email,
+        password,
+      });
+      set({ user: res.data.user, token: res.data.token });
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem("token", res.data.token);
+    },
 
-  logout: () => {
-    set({ user: null, token: null });
-    localStorage.removeItem("token");
-  },
-}));
+    register: async (name, email, password) => {
+      const res = await axios.post("http://localhost:5000/api/auth/register", {
+        name,
+        email,
+        password,
+      });
+      set({ user: res.data.user, token: res.data.token });
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem("token", res.data.token);
+    },
+
+    logout: () => {
+      set({ user: null, token: null });
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    },
+  };
+});

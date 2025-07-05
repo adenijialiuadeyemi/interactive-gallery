@@ -8,11 +8,16 @@ const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET || "";
 
 // ✅ Register
-router.post("/register", async (req, res) => {
+router.post("/register", async (req: any, res: any) => {
   try {
     const { name, email, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return res.status(409).json({ error: "User already exists" });
+    }
     const user = await prisma.user.create({
       data: { name, email, password: hashedPassword },
     });

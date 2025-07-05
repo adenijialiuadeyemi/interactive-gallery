@@ -138,38 +138,59 @@ router.get("/saved", async (req, res) => {
 });
 
 // Like or Unlike an image
-router.post("/like/:id", authenticate, async (req: any, res: any) => {
+router.post("/like/:unsplashId", authenticate, async (req: any, res: any) => {
+  const unsplashId = req.params.unsplashId;
+  const userId = req.user.id;
+
   try {
-    const imageId = req.params.id;
-    // @ts-ignore
-    const user = req.user;
+    // Check if image is already saved
+    let image = await prisma.image.findUnique({
+      where: { unsplashId },
+    });
 
-    // Check if image exists
-    const image = await prisma.image.findUnique({ where: { id: imageId } });
-    if (!image) return res.status(404).json({ error: "Image not found" });
+    // If not, fetch from Unsplash and save it
+    if (!image) {
+      const unsplashRes = await axios.get(
+        `https://api.unsplash.com/photos/${unsplashId}`,
+        {
+          headers: {
+            Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}`,
+          },
+        }
+      );
 
-    // Check if user already liked this image
+      const data = unsplashRes.data;
+      image = await prisma.image.create({
+        data: {
+          unsplashId: data.id,
+          title: data.alt_description || "Untitled",
+          author: data.user.name,
+          description: data.description || "",
+          tags: data.tags?.map((tag: any) => tag.title) || [],
+          thumbnail: data.urls.thumb,
+          full: data.urls.full,
+        },
+      });
+    }
+
+    // Toggle Like
     const existingLike = await prisma.like.findUnique({
       where: {
         userId_imageId: {
-          userId: user.id,
-          imageId,
+          userId,
+          imageId: image.id,
         },
       },
     });
 
     if (existingLike) {
-      // Unlike
-      await prisma.like.delete({
-        where: { id: existingLike.id },
-      });
+      await prisma.like.delete({ where: { id: existingLike.id } });
       return res.json({ message: "Unliked" });
     } else {
-      // Like
       await prisma.like.create({
         data: {
-          userId: user.id,
-          imageId,
+          userId,
+          imageId: image.id,
         },
       });
       return res.json({ message: "Liked" });

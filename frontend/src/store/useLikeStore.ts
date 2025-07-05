@@ -1,22 +1,14 @@
 import { create } from "zustand";
-import axios from "axios";
+import axios from "../api/axios";
 
 interface LikeState {
-  toggleLike: (imageId: string, token: string) => Promise<void>;
+  toggleLike: (imageId: string) => Promise<void>;
 }
 
-export const useLikeStore = create<LikeState>((_) => ({
-  toggleLike: async (imageId, token) => {
+export const useLikeStore = create<LikeState>(() => ({
+  toggleLike: async (imageId) => {
     try {
-      await axios.post(
-        `http://localhost:5000/api/images/like/${imageId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await axios.post(`/images/like/${imageId}`);
     } catch (error) {
       console.error("❌ Error toggling like:", error);
       throw error;

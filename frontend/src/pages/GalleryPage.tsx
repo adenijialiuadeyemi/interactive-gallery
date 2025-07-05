@@ -42,7 +42,7 @@ export default function GalleryPage() {
 
     loadImages();
   }, []);
-
+  console.log('USER:', user);
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-6">
       <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
@@ -111,7 +111,7 @@ export default function GalleryPage() {
                       if (!user) return navigate('/login');
 
                       try {
-                        await toggleLike(img.unsplashId, user);
+                        await toggleLike(img.unsplashId);
                         setImages((prev) =>
                           prev.map((i) =>
                             i.unsplashId === img.unsplashId ? { ...i, liked: !i.liked } : i
