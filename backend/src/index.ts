@@ -5,6 +5,7 @@ import imageRoutes from "./routes/images.route";
 
 import authRouter from "./routes/auth.route";
 import commentRouter from "./routes/comment.route";
+import imageRouter from "./routes/image.route";
 
 dotenv.config();
 
@@ -20,7 +21,7 @@ app.get("/", (_, res) => {
 });
 
 //end points
-app.use("/api/images", imageRoutes);
+app.use("/api/images", imageRouter);
 app.use("/api/comments", commentRouter);
 app.use("/api/auth", authRouter);
 
