@@ -1,6 +1,5 @@
-// src/components/AuthForm.tsx
 import { useState } from "react";
-import { Loader } from "lucide-react";
+import { Loader, LogIn, UserPlus } from "lucide-react";
 
 interface AuthFormProps {
   isLogin?: boolean;
@@ -69,9 +68,16 @@ export default function AuthForm({ isLogin = false, onSubmit }: AuthFormProps) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-300 flex justify-center items-center"
+        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-300 flex justify-center items-center gap-2"
       >
-        {loading ? <Loader className="animate-spin w-5 h-5" /> : isLogin ? "Login" : "Register"}
+        {loading ? (
+          <Loader className="animate-spin w-5 h-5" />
+        ) : (
+          <>
+            {isLogin ? <LogIn className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+            {isLogin ? "Login" : "Register"}
+          </>
+        )}
       </button>
     </form>
   );
