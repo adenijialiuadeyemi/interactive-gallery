@@ -1,4 +1,3 @@
-// src/pages/GalleryPage.tsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/axios";
@@ -6,6 +5,7 @@ import { useDeviceType } from "../hooks/useDeviceType";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Eye, Search } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuthStore } from "../store/useAuthStore"; // 👈 import auth state
 
 interface UnsplashImage {
   unsplashId: string;
@@ -28,6 +28,7 @@ export default function GalleryPage() {
 
   const navigate = useNavigate();
   const deviceType = useDeviceType();
+  const user = useAuthStore((state) => state.user); // 👈 get user from auth store
 
   const loadImages = async (pageToFetch = 1) => {
     try {
@@ -66,7 +67,16 @@ export default function GalleryPage() {
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20, scale: 0.95 },
-    show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: "easeOut" } },
+    show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: "easeOut" as const } },
+  };
+
+  // ✅ handle navigation based on auth status
+  const handleNavigate = (unsplashId: string) => {
+    if (!user) {
+      navigate("/login");
+    } else {
+      navigate(`/${unsplashId}`);
+    }
   };
 
   const renderImageGrid = () => (
@@ -83,7 +93,7 @@ export default function GalleryPage() {
           className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col"
         >
           <img
-            onClick={() => navigate(`/${img.unsplashId}`)}
+            onClick={() => handleNavigate(img.unsplashId)} // 👈 use auth-aware handler
             src={img.thumbnail}
             alt={img.title}
             className="w-full h-56 object-cover cursor-pointer"
@@ -93,7 +103,7 @@ export default function GalleryPage() {
             <p className="text-xs text-gray-500 mb-4">By {img.author}</p>
             <button
               className="mt-auto w-full flex items-center justify-center gap-2 bg-blue-600 text-white text-sm py-2 rounded hover:bg-blue-700 transition"
-              onClick={() => navigate(`/${img.unsplashId}`)}
+              onClick={() => handleNavigate(img.unsplashId)} // 👈 same here
             >
               <Eye className="w-4 h-4" />
               View Detail
@@ -102,7 +112,6 @@ export default function GalleryPage() {
         </motion.div>
       ))}
     </motion.div>
-
   );
 
   return (
@@ -121,10 +130,8 @@ export default function GalleryPage() {
         </p>
       </motion.div>
 
-
       {/* Search + Category Controls */}
       <div className="flex flex-col lg:flex-row gap-4 mb-10 justify-center items-center">
-        {/* Search Input */}
         <div className="relative w-full max-w-md">
           <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
           <input
@@ -137,7 +144,6 @@ export default function GalleryPage() {
           />
         </div>
 
-        {/* Category Dropdown */}
         <select
           value={category}
           onChange={(e) => {
