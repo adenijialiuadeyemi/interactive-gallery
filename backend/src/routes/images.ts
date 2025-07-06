@@ -52,7 +52,7 @@ router.get("/unsplash", async (req, res) => {
 });
 
 // Save an image to the database
-router.post("/save", async (req: any, res: any) => {
+/* router.post("/save", async (req: any, res: any) => {
   try {
     const { unsplashId, title, author, description, tags } = req.body;
 
@@ -80,10 +80,10 @@ router.post("/save", async (req: any, res: any) => {
     console.error(err);
     res.status(500).json({ error: "Error saving image" });
   }
-});
+}); */
 
 // Get saved images with pagination and filtering
-router.get("/saved", async (req, res) => {
+/* router.get("/saved", async (req, res) => {
   try {
     // Parse query params or fall back to defaults
     const page = parseInt(req.query.page as string) || 1;
@@ -152,7 +152,7 @@ router.get("/saved", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Error filtering images" });
   }
-});
+}); */
 
 // Like or Unlike an image
 router.post("/like/:unsplashId", authenticate, async (req: any, res: any) => {
@@ -220,9 +220,9 @@ router.post("/like/:unsplashId", authenticate, async (req: any, res: any) => {
 
 // Get image by unsplashId
 
-router.get("/:unsplashId", authenticate, async (req: any, res) => {
+router.get("/:unsplashId", authenticate, async (req: any, res: any) => {
   const { unsplashId } = req.params;
-  const userId = req.user?.id; // will be undefined if not logged in
+  const userId = req.user?.id;
 
   try {
     let image = await prisma.image.findUnique({
@@ -239,7 +239,6 @@ router.get("/:unsplashId", authenticate, async (req: any, res) => {
     });
 
     if (!image) {
-      // Fetch from Unsplash if not in DB
       const response = await axios.get(
         `https://api.unsplash.com/photos/${unsplashId}`,
         {
@@ -251,7 +250,7 @@ router.get("/:unsplashId", authenticate, async (req: any, res) => {
 
       const data = response.data;
 
-      image = await prisma.image.create({
+      await prisma.image.create({
         data: {
           unsplashId: data.id,
           title: data.alt_description || "Untitled",
@@ -263,7 +262,6 @@ router.get("/:unsplashId", authenticate, async (req: any, res) => {
         },
       });
 
-      // Refetch with related data
       image = await prisma.image.findUnique({
         where: { unsplashId },
         include: {
@@ -276,11 +274,14 @@ router.get("/:unsplashId", authenticate, async (req: any, res) => {
           },
         },
       });
+
+      if (!image) {
+        return res.status(404).json({ error: "Image could not be loaded" });
+      }
     }
 
-    // Check if the user has liked it
+    // ✅ Check if the logged-in user has liked this image
     let liked = false;
-
     if (userId) {
       const like = await prisma.like.findUnique({
         where: {
@@ -293,7 +294,10 @@ router.get("/:unsplashId", authenticate, async (req: any, res) => {
       liked = !!like;
     }
 
-    res.json({ ...image, liked });
+    res.json({
+      ...image,
+      liked,
+    });
   } catch (err) {
     console.error("❌ Error fetching image details:", err);
     res.status(500).json({ error: "Failed to load image details" });

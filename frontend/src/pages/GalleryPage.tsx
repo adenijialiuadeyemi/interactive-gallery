@@ -92,7 +92,7 @@ export default function GalleryPage() {
             <h2 className="text-md font-semibold text-gray-800 truncate">{img.title}</h2>
             <p className="text-xs text-gray-500 mb-4">By {img.author}</p>
             <button
-              className="mt-auto w-full flex items-center justify-center gap-2 bg-blue-600 text-white text-sm py-2 rounded hover:bg-blue-700 transition cursor-pointer"
+              className="mt-auto w-full flex items-center justify-center gap-2 bg-blue-600 text-white text-sm py-2 rounded hover:bg-blue-700 transition"
               onClick={() => navigate(`/${img.unsplashId}`)}
             >
               <Eye className="w-4 h-4" />
@@ -188,7 +188,7 @@ export default function GalleryPage() {
       ) : (
         <>
           {renderImageGrid()}
-          <div className="flex justify-center gap-4 mt-10">
+          <div className="flex justify-center gap-4 mt-10 mb-20">
             <button
               disabled={page === 1}
               onClick={() => loadImages(page - 1)}

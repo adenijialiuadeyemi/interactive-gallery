@@ -5,6 +5,8 @@ import { Heart, ArrowLeft } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useLikeStore } from "../store/useLikeStore";
 import { useCommentStore } from "../store/useCommentStore";
+import confetti from "canvas-confetti";
+import { motion } from "framer-motion";
 
 interface Image {
   id: string;
@@ -31,7 +33,6 @@ export default function ImageDetailPage() {
   const comments = useCommentStore((state) => state.comments);
   const toggleLike = useLikeStore((state) => state.toggleLike);
 
-  // Fetch image + comments
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -56,19 +57,26 @@ export default function ImageDetailPage() {
       setImage((prev) =>
         prev ? { ...prev, liked: !prev.liked } : prev
       );
+
+      if (!image?.liked) {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.6 },
+        });
+      }
     } catch (err) {
       console.error("Like toggle failed:", err);
     }
   };
 
   const handleSubmit = async () => {
-    if (!user) return navigate("/login"); //Redirect unauthenticated
+    if (!user) return navigate("/login");
     if (!newComment || newComment.trim().length < 3) return;
 
     try {
       await postComment(unsplashId!, newComment.trim());
       setNewComment("");
-      //Re-fetch comments after post
       await fetchComments(unsplashId!);
     } catch (err) {
       console.error("Failed to post comment:", err);
@@ -80,7 +88,12 @@ export default function ImageDetailPage() {
   }
 
   return (
-    <div className="min-h-screen mt-[10px]  bg-gray-50 px-4 py-6 max-w-4xl mx-auto">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="min-h-screen mt-[10px] bg-gray-50 px-4 py-6 max-w-4xl mx-auto"
+    >
       <button
         onClick={() => navigate(-1)}
         className="text-blue-600 flex items-center mb-4 hover:underline"
@@ -89,7 +102,12 @@ export default function ImageDetailPage() {
         Back
       </button>
 
-      <div className="bg-white shadow-md rounded-xl overflow-hidden">
+      <motion.div
+        initial={{ scale: 0.98, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.6 }}
+        className="bg-white shadow-md rounded-xl overflow-hidden"
+      >
         <img
           src={image.full}
           alt={image.title}
@@ -126,9 +144,14 @@ export default function ImageDetailPage() {
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="mt-8">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.5 }}
+        className="mt-8"
+      >
         <h2 className="text-lg font-semibold text-gray-800 mb-2">Comments</h2>
 
         <div className="flex items-center gap-2 mb-4">
@@ -147,21 +170,27 @@ export default function ImageDetailPage() {
           </button>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-3 mb-20">
           {comments.length === 0 && (
             <p className="text-sm text-gray-500">No comments yet.</p>
           )}
           {comments.map((c) => (
-            <div key={c.id} className="bg-white p-4 rounded shadow-sm">
+            <motion.div
+              key={c.id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white p-4 rounded shadow-sm"
+            >
               <p className="text-sm font-semibold text-gray-700">{c.user.name}</p>
               <p className="text-gray-600 text-sm mt-1">{c.content}</p>
               <p className="text-xs text-gray-400 mt-1">
                 {new Date(c.createdAt).toLocaleString()}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
