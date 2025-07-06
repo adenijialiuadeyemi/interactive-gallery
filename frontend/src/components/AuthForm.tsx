@@ -31,11 +31,7 @@ export default function AuthForm({ isLogin = false, onSubmit }: AuthFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-6 w-full max-w-md mx-auto">
-      <h2 className="text-2xl font-semibold text-center text-gray-800 mb-4">
-        {isLogin ? "🔐 Login to your account" : "📝 Create a new account"}
-      </h2>
-
+    <form onSubmit={handleSubmit} className="space-y-4">
       {!isLogin && (
         <input
           type="text"
@@ -44,7 +40,7 @@ export default function AuthForm({ isLogin = false, onSubmit }: AuthFormProps) {
           onChange={handleChange}
           value={formData.name}
           required
-          className="w-full mb-3 p-2 border rounded"
+          className="w-full p-2 border rounded"
         />
       )}
 
@@ -55,7 +51,7 @@ export default function AuthForm({ isLogin = false, onSubmit }: AuthFormProps) {
         onChange={handleChange}
         value={formData.email}
         required
-        className="w-full mb-3 p-2 border rounded"
+        className="w-full p-2 border rounded"
       />
 
       <input
@@ -65,10 +61,10 @@ export default function AuthForm({ isLogin = false, onSubmit }: AuthFormProps) {
         onChange={handleChange}
         value={formData.password}
         required
-        className="w-full mb-4 p-2 border rounded"
+        className="w-full p-2 border rounded"
       />
 
-      {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
+      {error && <p className="text-red-500 text-sm">{error}</p>}
 
       <button
         type="submit"

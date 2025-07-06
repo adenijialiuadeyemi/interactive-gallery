@@ -4,9 +4,14 @@ import prisma from "../lib/prisma";
 import { authenticate } from "../middleware/auth";
 const router = Router();
 
+// Fetch images from Unsplash with pagination and search
+// Example: GET /api/images/unsplash?page=1&perPage=9&query=nature
+// Default query is "nature" if not provided
 router.get("/unsplash", async (req, res) => {
   try {
-    const { page = 1, perPage = 9, query = "nature" } = req.query;
+    const page = Number(req.query.page) || 1;
+    const perPage = Number(req.query.perPage) || 9;
+    const query = (req.query.query as string) || "nature";
 
     const response = await axios.get("https://api.unsplash.com/search/photos", {
       headers: {
@@ -32,17 +37,21 @@ router.get("/unsplash", async (req, res) => {
     }));
 
     res.json({
-      page: Number(page),
-      perPage: Number(perPage),
+      page,
+      perPage,
       totalPages,
       images,
     });
   } catch (error: any) {
-    console.error(error.response?.data || error.message);
+    console.error(
+      "❌ Unsplash API error:",
+      error.response?.data || error.message
+    );
     res.status(500).json({ error: "Failed to fetch from Unsplash" });
   }
 });
 
+// Save an image to the database
 router.post("/save", async (req: any, res: any) => {
   try {
     const { unsplashId, title, author, description, tags } = req.body;
@@ -73,6 +82,7 @@ router.post("/save", async (req: any, res: any) => {
   }
 });
 
+// Get saved images with pagination and filtering
 router.get("/saved", async (req, res) => {
   try {
     // Parse query params or fall back to defaults
@@ -208,8 +218,11 @@ router.post("/like/:unsplashId", authenticate, async (req: any, res: any) => {
   }
 });
 
-router.get("/:unsplashId", async (req: any, res: any) => {
+// Get image by unsplashId
+
+router.get("/:unsplashId", authenticate, async (req: any, res) => {
   const { unsplashId } = req.params;
+  const userId = req.user?.id; // will be undefined if not logged in
 
   try {
     let image = await prisma.image.findUnique({
@@ -226,7 +239,7 @@ router.get("/:unsplashId", async (req: any, res: any) => {
     });
 
     if (!image) {
-      // Fetch from Unsplash if not found in DB
+      // Fetch from Unsplash if not in DB
       const response = await axios.get(
         `https://api.unsplash.com/photos/${unsplashId}`,
         {
@@ -250,7 +263,7 @@ router.get("/:unsplashId", async (req: any, res: any) => {
         },
       });
 
-      // Reload to include defaults (e.g., comments)
+      // Refetch with related data
       image = await prisma.image.findUnique({
         where: { unsplashId },
         include: {
@@ -265,7 +278,22 @@ router.get("/:unsplashId", async (req: any, res: any) => {
       });
     }
 
-    res.json(image);
+    // Check if the user has liked it
+    let liked = false;
+
+    if (userId) {
+      const like = await prisma.like.findUnique({
+        where: {
+          userId_imageId: {
+            userId,
+            imageId: image.id,
+          },
+        },
+      });
+      liked = !!like;
+    }
+
+    res.json({ ...image, liked });
   } catch (err) {
     console.error("❌ Error fetching image details:", err);
     res.status(500).json({ error: "Failed to load image details" });
