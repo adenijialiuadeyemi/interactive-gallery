@@ -1,7 +1,7 @@
 import { Router } from "express";
 import axios from "axios";
 import prisma from "../lib/prisma";
-import { authenticate } from "../middleware/auth";
+import { authenticate } from "../middleware/auth.middleware";
 const router = Router();
 
 // Fetch images from Unsplash with pagination and search
