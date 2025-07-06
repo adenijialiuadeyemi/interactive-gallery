@@ -19,7 +19,9 @@ router.get("/unsplash", async (req, res) => {
       },
     });
 
-    const formatted = response.data.results.map((img: any) => ({
+    const totalPages = response.data.total_pages;
+
+    const images = response.data.results.map((img: any) => ({
       unsplashId: img.id,
       title: img.alt_description || "Untitled",
       author: img.user.name,
@@ -29,7 +31,12 @@ router.get("/unsplash", async (req, res) => {
       tags: img.tags?.map((tag: any) => tag.title) || [],
     }));
 
-    res.json(formatted);
+    res.json({
+      page: Number(page),
+      perPage: Number(perPage),
+      totalPages,
+      images,
+    });
   } catch (error: any) {
     console.error(error.response?.data || error.message);
     res.status(500).json({ error: "Failed to fetch from Unsplash" });

@@ -62,11 +62,14 @@ export default function ImageDetailPage() {
   };
 
   const handleSubmit = async () => {
+    if (!user) return navigate("/login"); //Redirect unauthenticated
     if (!newComment || newComment.trim().length < 3) return;
 
     try {
       await postComment(unsplashId!, newComment.trim());
       setNewComment("");
+      //Re-fetch comments after post
+      await fetchComments(unsplashId!);
     } catch (err) {
       console.error("Failed to post comment:", err);
     }
