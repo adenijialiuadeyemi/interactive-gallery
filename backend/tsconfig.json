@@ -1,13 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
-    "outDir": "./build",
-    "rootDir": "./src",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true
+    "target": "ES2020", // Good modern target
+    "module": "commonjs", // Compatible with Node.js
+    "outDir": "./dist", // Where compiled files go
+    "rootDir": "./src", // Where source files are
+    "strict": true, // Enables all strict type-checking options
+    "esModuleInterop": true, // Allows default import compatibility
+    "forceConsistentCasingInFileNames": true, // Prevents casing bugs
+    "skipLibCheck": true, // Speeds up builds by skipping type checks on libs
+    "resolveJsonModule": true, // Allows importing JSON files
+    "moduleResolution": "node", // Ensures compatibility with Node.js modules
+    "sourceMap": true // Optional: useful for debugging in production
   },
   "include": ["src"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist"]
 }
