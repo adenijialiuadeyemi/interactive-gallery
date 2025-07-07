@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Health check endpoint
 app.get("/", (_, res) => {
-  res.send("API is running...");
+  res.send("Welcome to the Interactive Gallery API!");
 });
 
 // Routes
