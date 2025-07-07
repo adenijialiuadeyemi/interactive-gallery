@@ -1,4 +1,3 @@
-// src/hooks/useDeviceType.ts
 import { useEffect, useState } from "react";
 
 export function useDeviceType(): "mobile" | "desktop" {
