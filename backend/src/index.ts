@@ -27,13 +27,6 @@ app.use("/api/images", imageRouter);
 app.use("/api/comments", commentRouter);
 app.use("/api/auth", authRouter);
 
-// Serve static frontend from dist
-app.use(express.static(path.join(__dirname, "../../frontend/dist")));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
-});
-
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
