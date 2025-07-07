@@ -99,6 +99,7 @@ npm run dev
 PORT=5000
 DATABASE_URL=your_neon_db_url
 JWT_SECRET=your_jwt_secret
+UNSPLASH_ACCESS_KEY=your_unsplash_access_key
 ```
 
 ## 📦 Backend (backend/.env)
@@ -110,7 +111,7 @@ JWT_SECRET=your_jwt_secret
 
 ## 🎨 Frontend (frontend/.env)
 ```
-VITE_API_URL=https://interactive-backend.onrender.com
+VITE_API_URL=https://interactive-gallery-backend.onrender.com
 ```
 ---
 
@@ -133,13 +134,13 @@ VITE_API_URL=https://interactive-backend.onrender.com
 ---
 ### 📂 Sample API Endpoints
 ```
-| Method | Endpoint                | Description             |
-| ------ | ----------------------  | ----------------------- |
-| GET    | `/api/images`           | Get gallery images      |
-| GET    | `/api/images/:id`       | Get image details       |
-| POST   | `/api/comments`         | Add comment to an image |
-| POST   | `/api/auth/register`    | Register a new user     |
-| POST   | `/api/auth/login`       | Login user              |
+| Method | Endpoint                    | Description             |
+| ------ | --------------------------  | ----------------------- |
+| GET    | `/api/images`               | Get gallery images      |
+| GET    | `/api/images/:unsplashid`   | Get image details       |
+| POST   | `/api/comments`             | Add comment to an image |
+| POST   | `/api/auth/register`        | Register a new user     |
+| POST   | `/api/auth/login`           | Login user              |
 ```
 
 ---
