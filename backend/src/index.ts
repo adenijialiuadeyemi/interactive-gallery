@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
 
 import authRouter from "./routes/auth.route";
 import commentRouter from "./routes/comment.route";
@@ -25,6 +26,13 @@ app.get("/", (_, res) => {
 app.use("/api/images", imageRouter);
 app.use("/api/comments", commentRouter);
 app.use("/api/auth", authRouter);
+
+// Serve static frontend from dist
+app.use(express.static(path.join(__dirname, "../../frontend/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
+});
 
 // Start the server
 app.listen(PORT, () => {
