@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Loader, LogIn, UserPlus } from "lucide-react";
+import { Loader, LogIn, UserPlus, Eye, EyeOff } from "lucide-react";
 
 interface AuthFormProps {
   isLogin?: boolean;
@@ -10,6 +10,7 @@ export default function AuthForm({ isLogin = false, onSubmit }: AuthFormProps) {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -53,15 +54,25 @@ export default function AuthForm({ isLogin = false, onSubmit }: AuthFormProps) {
         className="w-full p-2 border rounded"
       />
 
-      <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        onChange={handleChange}
-        value={formData.password}
-        required
-        className="w-full p-2 border rounded"
-      />
+      <div className="relative">
+        <input
+          type={showPassword ? "text" : "password"}
+          name="password"
+          placeholder="Password"
+          onChange={handleChange}
+          value={formData.password}
+          required
+          className="w-full p-2 border rounded pr-10"
+        />
+        <button
+          type="button"
+          onClick={() => setShowPassword((prev) => !prev)}
+          className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+          tabIndex={-1}
+        >
+          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+        </button>
+      </div>
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
