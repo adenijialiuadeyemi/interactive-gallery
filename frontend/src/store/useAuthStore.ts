@@ -18,7 +18,7 @@ export const useAuthStore = create<AuthState>((set) => {
     token: storedToken || null,
 
     login: async (email, password) => {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+      const res = await axios.post("/auth/login", {
         email,
         password,
       });
@@ -28,7 +28,7 @@ export const useAuthStore = create<AuthState>((set) => {
     },
 
     register: async (name, email, password) => {
-      const res = await axios.post("http://localhost:5000/api/auth/register", {
+      const res = await axios.post("/auth/register", {
         name,
         email,
         password,
